@@ -16,6 +16,18 @@ public class PlayerController : MonoBehaviour
     private float _bulletSpeed;
     private Vector3 _finishPosition;
     private GameObject _finishPositionMark;
+    
+    
+    
+
+    void Start()
+    {
+        
+        
+        var RudolfAnimations = gameObject.GetComponentsInChildren.<Animation>();
+    }
+    
+    
     void Update()
     {
         if (Input.GetButtonDown("Fire1"))
@@ -26,6 +38,7 @@ public class PlayerController : MonoBehaviour
             {
                 _finishPosition = hit.point;
                 _finishPositionMark = Instantiate(finishPositionPrefab, _finishPosition, Quaternion.Euler(0,0,0)) as GameObject;
+                GetComponentInChildren(Animation)
             }
         }
 
