@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
                 RaycastHit hit;
                 Physics.Raycast(ray, out hit);
                 _moveLock = true;
-                _bulletSpeed = Mathf.Abs(-hit.point.x) + Mathf.Abs(-hit.point.z);
+                _bulletSpeed = Vector3.Distance(hit.point, _finishPosition);
                 Debug.Log("Speed = " + Mathf.Abs(-hit.point.x) + Mathf.Abs(-hit.point.z));
                 if (Mathf.Abs(-hit.point.x) > 0.1 || Mathf.Abs(-hit.point.z) > 0.1)
                 {
@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour
                     Rigidbody instBulletRigidbody = bulletInstance.GetComponent<Rigidbody>();
                     instBulletRigidbody.centerOfMass = new Vector3(0, 0, 0.5f);
                     instBulletRigidbody.AddForce(transform.forward * _bulletSpeed * bulletSpeedMult);
+                    Debug.Log(_bulletSpeed);
                 }
             }
         }
