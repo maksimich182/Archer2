@@ -62,12 +62,17 @@ public class PlayerController : MonoBehaviour
             Destroy(_finishPositionMark);
             if (_moveLock == true)
             {
-                _moveLock = false;
-                arrow.transform.position = transform.position;
-                GameObject bulletInstance = Instantiate(bulletPrefab, gunPoint.position, gunPoint.rotation) as GameObject;
-                Rigidbody instBulletRigidbody = bulletInstance.GetComponent<Rigidbody>();
-                instBulletRigidbody.centerOfMass = new Vector3(0, 0, 0.5f);
-                instBulletRigidbody.AddForce(transform.forward * _bulletSpeed * bulletSpeedMult);
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit) && hit.collider.gameObject.layer == 8 && hit.point != _finishPosition)
+                {
+                    _moveLock = false;
+                    arrow.transform.position = transform.position;
+                    GameObject bulletInstance = Instantiate(bulletPrefab, gunPoint.position, gunPoint.rotation) as GameObject;
+                    Rigidbody instBulletRigidbody = bulletInstance.GetComponent<Rigidbody>();
+                    instBulletRigidbody.centerOfMass = new Vector3(0, 0, 0.5f);
+                    instBulletRigidbody.AddForce(transform.forward * _bulletSpeed * bulletSpeedMult);
+                }
             }
         }
     }
