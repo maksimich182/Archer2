@@ -16,71 +16,96 @@ public class PlayerController : MonoBehaviour
     private float _bulletSpeed;
     private Vector3 _finishPosition;
     private GameObject _finishPositionMark;
-    
-    
-    
+    private Animator animator;
+    private RaycastHit _rayMousePosition;
+
+    private void Start()
+    {
+        animator = GetComponent<Animator>();
+    }
+
     void Update()
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit) && hit.collider.gameObject.layer == 8)
-            {
-                _finishPosition = hit.point;
-                _finishPositionMark = Instantiate(finishPositionPrefab, _finishPosition, Quaternion.Euler(0,0,0)) as GameObject;
-              
-            }
+            GetCursorFinishPosition();
         }
 
         if (Input.GetButton("Fire1"))
         {
             if (transform.position == _finishPosition)
             {
+                animator.SetBool("Walk", false);
                 Destroy(_finishPositionMark);
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
-                Physics.Raycast(ray, out hit);
+                GetMousePosition(out _rayMousePosition);
                 _moveLock = true;
-                _bulletSpeed = Vector3.Distance(hit.point, _finishPosition);
-                Debug.Log("Speed = " + Mathf.Abs(-hit.point.x) + Mathf.Abs(-hit.point.z));
-                if (Mathf.Abs(-hit.point.x) > 0.1 || Mathf.Abs(-hit.point.z) > 0.1)
-                {
-                    Vector3 HitPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
-                    transform.LookAt(2 * transform.position - HitPos);
-                    arrow.transform.position = HitPos;
-                }
-                else
-                {
-                    //transform.rotation = Quaternion.LookRotation(Vector3.back);
-                }
+                PullBowString(_rayMousePosition);
             }
             else
             {
-                transform.position = Vector3.MoveTowards(transform.position, _finishPosition, speed);
+                animator.SetBool("Walk", true);
+                MoveToPosition();
             }
         }
 
         if (Input.GetButtonUp("Fire1"))
         {
+            animator.SetBool("Walk", false);
             Destroy(_finishPositionMark);
             if (_moveLock == true)
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit) && hit.collider.gameObject.layer == 8 && hit.point != _finishPosition)
+                GetMousePosition(out _rayMousePosition);
+                if (_rayMousePosition.collider.gameObject.layer == 8 && _rayMousePosition.point != _finishPosition)
                 {
                     _moveLock = false;
-                    arrow.transform.position = transform.position;
-                    GameObject bulletInstance = Instantiate(bulletPrefab, gunPoint.position, gunPoint.rotation) as GameObject;
-                    Rigidbody instBulletRigidbody = bulletInstance.GetComponent<Rigidbody>();
-                    instBulletRigidbody.centerOfMass = new Vector3(0, 0, 0.5f);
-                    instBulletRigidbody.AddForce(transform.forward * _bulletSpeed * bulletSpeedMult);
-                    Debug.Log(_bulletSpeed);
+                    Shoot();
                 }
             }
         }
     }
 
+    private void Shoot()
+    {
+        arrow.transform.position = transform.position;
+        GameObject bulletInstance = Instantiate(bulletPrefab, gunPoint.position, gunPoint.rotation) as GameObject;
+        Rigidbody instBulletRigidbody = bulletInstance.GetComponent<Rigidbody>();
+        instBulletRigidbody.centerOfMass = new Vector3(0, 0, 0.5f);
+        instBulletRigidbody.AddForce(transform.forward * _bulletSpeed * bulletSpeedMult);
+        animator.SetBool("Attack", false);
+    }
 
+    private void GetMousePosition(out RaycastHit hit)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Physics.Raycast(ray, out hit);
+    }
+
+    private void PullBowString(RaycastHit hit)
+    {
+        animator.SetBool("Attack", true);
+        _bulletSpeed = Vector3.Distance(hit.point, _finishPosition);
+        if (Mathf.Abs(-hit.point.x) > 0.1 || Mathf.Abs(-hit.point.z) > 0.1)
+        {
+            Vector3 HitPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
+            transform.LookAt(2 * transform.position - HitPos);
+            arrow.transform.position = HitPos;
+        }
+    }
+
+    private void MoveToPosition()
+    {
+        transform.position = Vector3.MoveTowards(transform.position, _finishPosition, speed);
+        transform.LookAt(_finishPosition);
+    }
+
+    private void GetCursorFinishPosition()
+    {
+        GetMousePosition(out _rayMousePosition);
+        if (_rayMousePosition.collider.gameObject.layer == 8)
+        {
+            _finishPosition = _rayMousePosition.point;
+            _finishPosition.y = 0f;
+            _finishPositionMark = Instantiate(finishPositionPrefab, _finishPosition, Quaternion.Euler(0, 0, 0)) as GameObject;
+        }
+    }
 }
