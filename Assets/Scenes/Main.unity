@@ -10614,6 +10614,25 @@ MonoBehaviour:
   gunPoint: {fileID: 1210294547}
   bulletSpeedMult: 300
   speed: 0.1
+--- !u!111 &1143314761
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1143314757}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: e10cd6dd952768342b73c2d93d6a8586, type: 3}
+  m_Animations:
+  - {fileID: 7400000, guid: 16cda1df8e8488140b452bf733ae803c, type: 3}
+  - {fileID: 7400000, guid: 3e88f259de3e4324485ab932c09ff16d, type: 3}
+  - {fileID: -3704289112126983070, guid: 3e88f259de3e4324485ab932c09ff16d, type: 3}
+  - {fileID: 7400000, guid: e10cd6dd952768342b73c2d93d6a8586, type: 3}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!4 &1161567271 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 403426, guid: 55ca4401075700d46a23ae8179a79579,
@@ -15260,7 +15279,13 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 2f2e078202f8c8d4fb9f8cc4fdb31b86, type: 2}
-    m_RemovedComponents: []
+    - target: {fileID: 95510566320478306, guid: 8bda6d7525d4a394a9afee23081281b7,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 95510566320478306, guid: 8bda6d7525d4a394a9afee23081281b7, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 8bda6d7525d4a394a9afee23081281b7, type: 3}
 --- !u!43 &1602795746
 Mesh:
@@ -15268,7 +15293,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh63146
+  m_Name: pb_Mesh14344
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2

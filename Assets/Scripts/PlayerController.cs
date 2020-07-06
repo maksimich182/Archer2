@@ -13,19 +13,28 @@ public class PlayerController : MonoBehaviour
     public float speed = 5;
 
     private bool _moveLock = false;
+    private bool _animationPullingStringLock = false;
     private float _bulletSpeed;
     private Vector3 _finishPosition;
     private GameObject _finishPositionMark;
-    private Animator animator;
+    private Animation _animation;
     private RaycastHit _rayMousePosition;
 
     private void Start()
     {
-        animator = GetComponent<Animator>();
+        _animation = GetComponent<Animation>();
+        _animation["PullingString"].speed = 2f;
+        _animation["Shoot"].speed = 2f;
+        _animation["Walk_Bow"].speed = 2f;
     }
 
     void Update()
     {
+        if (_animationPullingStringLock == false)
+        {
+            _animation.PlayQueued("Idle_Bow");
+        }
+
         if (Input.GetButtonDown("Fire1"))
         {
             GetCursorFinishPosition();
@@ -35,29 +44,36 @@ public class PlayerController : MonoBehaviour
         {
             if (transform.position == _finishPosition)
             {
-                animator.SetBool("Walk", false);
                 Destroy(_finishPositionMark);
                 GetMousePosition(out _rayMousePosition);
                 _moveLock = true;
+                if(_animationPullingStringLock == false)
+                {
+                    _animationPullingStringLock = true;
+                    _animation.Play("PullingString", PlayMode.StopAll);
+                }
                 PullBowString(_rayMousePosition);
             }
             else
             {
-                animator.SetBool("Walk", true);
+                _animation.Play("Walk_Bow", PlayMode.StopAll);
                 MoveToPosition();
             }
         }
 
         if (Input.GetButtonUp("Fire1"))
         {
-            animator.SetBool("Walk", false);
+            _animationPullingStringLock = false;
+            _animation.Play("Idle_Bow", PlayMode.StopAll);
             Destroy(_finishPositionMark);
             if (_moveLock == true)
             {
                 GetMousePosition(out _rayMousePosition);
-                if (_rayMousePosition.collider.gameObject.layer == 8 && _rayMousePosition.point != _finishPosition)
+                bool xzCoordinateEquation = _rayMousePosition.point.x == _finishPosition.x && _rayMousePosition.point.z == _finishPosition.z;
+                if (_rayMousePosition.collider.gameObject.layer == 8 && xzCoordinateEquation == false)
                 {
                     _moveLock = false;
+                    _animation.Play("Shoot", PlayMode.StopAll);
                     Shoot();
                 }
             }
@@ -71,7 +87,6 @@ public class PlayerController : MonoBehaviour
         Rigidbody instBulletRigidbody = bulletInstance.GetComponent<Rigidbody>();
         instBulletRigidbody.centerOfMass = new Vector3(0, 0, 0.5f);
         instBulletRigidbody.AddForce(transform.forward * _bulletSpeed * bulletSpeedMult);
-        animator.SetBool("Attack", false);
     }
 
     private void GetMousePosition(out RaycastHit hit)
@@ -82,7 +97,6 @@ public class PlayerController : MonoBehaviour
 
     private void PullBowString(RaycastHit hit)
     {
-        animator.SetBool("Attack", true);
         _bulletSpeed = Vector3.Distance(hit.point, _finishPosition);
         if (Mathf.Abs(-hit.point.x) > 0.1 || Mathf.Abs(-hit.point.z) > 0.1)
         {
@@ -104,8 +118,8 @@ public class PlayerController : MonoBehaviour
         if (_rayMousePosition.collider.gameObject.layer == 8)
         {
             _finishPosition = _rayMousePosition.point;
-            _finishPosition.y = 0f;
             _finishPositionMark = Instantiate(finishPositionPrefab, _finishPosition, Quaternion.Euler(0, 0, 0)) as GameObject;
+            _finishPosition.y = 0f;     //TODO: Костыльная методика задачи координат. Исправить
         }
     }
 }
