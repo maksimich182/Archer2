@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
                 if(_animationPullingStringLock == false)
                 {
                     _animationPullingStringLock = true;
+                    _animation["PullingString"].speed = 2f;
                     _animation.Play("PullingString", PlayMode.StopAll);
                 }
                 PullBowString(_rayMousePosition);
@@ -76,7 +77,14 @@ public class PlayerController : MonoBehaviour
                     _animation.Play("Shoot", PlayMode.StopAll);
                     Shoot();
                 }
+                else
+                {
+                    _animation["PullingString"].speed = -2f;
+                    _animation["PullingString"].time = _animation["PullingString"].length;
+                    _animation.Play("PullingString", PlayMode.StopAll);
+                }
             }
+            
         }
     }
 
