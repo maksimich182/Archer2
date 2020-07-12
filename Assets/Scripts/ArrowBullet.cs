@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class ArrowBullet : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public Collider arrow;
+    public Collider arrowHead;
+    public float timeToDestroy = 5;
 
-    void OnTriggerEnter(Collider coll)
+    IEnumerator OnTriggerEnter(Collider coll)
     {
         if (coll.gameObject.layer == 9)
         {
@@ -14,27 +16,23 @@ public class ArrowBullet : MonoBehaviour
         }
         if (coll.gameObject.layer == 10)
         {
-           // GetComponentInParent<Rigidbody>().freezeRotation = true;
-           // GetComponentInParent<Rigidbody>().transform.position = transform.position;
-            GetComponentInParent<Rigidbody>().Sleep();
+            arrowHead.GetComponent<Collider>().isTrigger = false;
+            arrow.GetComponent<Rigidbody>().Sleep();
+            yield return wait(timeToDestroy);
+            arrowHead.GetComponent<Collider>().isTrigger = true;
+            arrow.GetComponent<Collider>().isTrigger = true;
         }
-    }
-    /*void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.layer == 9)
-        {
-            Destroy(collision.gameObject);
-        }
-    } */
-    void Start()
-    {
-        
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator wait(float waitTime)
     {
-        
+        float counter = 0;
+
+        while (counter < waitTime)
+        {
+            counter += Time.deltaTime;
+            yield return null;
+        }
     }
-    
+
 }
