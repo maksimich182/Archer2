@@ -6,17 +6,21 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public GameObject bulletPrefab;
-    public GameObject arrow;
     public GameObject finishPositionPrefab;
+    public GameObject shootVectorPrefab;
+    public Material shootVectorMaterial;
     public Transform gunPoint;
     public int bulletSpeedMult = 10;
     public float speed = 5;
+    public float multSzShootVector = 5;
 
     private bool _moveLock = false;
     private bool _animationPullingStringLock = false;
+    private bool _createShootVector = false;
     private float _bulletSpeed;
     private Vector3 _finishPosition;
     private GameObject _finishPositionMark;
+    private GameObject _shootVector;
     private Animation _animation;
     private RaycastHit _rayMousePosition;
 
@@ -53,6 +57,7 @@ public class PlayerController : MonoBehaviour
                     _animation["PullingString"].speed = 2f;
                     _animation.Play("PullingString", PlayMode.StopAll);
                 }
+
                 PullBowString(_rayMousePosition);
             }
             else
@@ -65,6 +70,8 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonUp("Fire1"))
         {
             _animationPullingStringLock = false;
+            _createShootVector = false;
+            Destroy(_shootVector);
             _animation.Play("Idle_Bow", PlayMode.StopAll);
             Destroy(_finishPositionMark);
             if (_moveLock == true)
@@ -90,7 +97,6 @@ public class PlayerController : MonoBehaviour
 
     private void Shoot()
     {
-        arrow.transform.position = transform.position;
         GameObject bulletInstance = Instantiate(bulletPrefab, gunPoint.position, gunPoint.rotation) as GameObject;
         Rigidbody instBulletRigidbody = bulletInstance.GetComponent<Rigidbody>();
         instBulletRigidbody.centerOfMass = new Vector3(0, 0, 0.5f);
@@ -105,13 +111,39 @@ public class PlayerController : MonoBehaviour
 
     private void PullBowString(RaycastHit hit)
     {
-        _bulletSpeed = Vector3.Distance(hit.point, _finishPosition);
-        if (Mathf.Abs(-hit.point.x) > 0.1 || Mathf.Abs(-hit.point.z) > 0.1)
+        _bulletSpeed = Vector3.Distance(new Vector3(hit.point.x, 0f, hit.point.z), _finishPosition);
+        Debug.Log(_bulletSpeed);
+        Vector3 HitPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
+        transform.LookAt(2 * transform.position - HitPos);
+        //GameObject shootVector = null;
+        if (_createShootVector == false)
         {
-            Vector3 HitPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
-            transform.LookAt(2 * transform.position - HitPos);
-            arrow.transform.position = HitPos;
+            _createShootVector = true;
+            _shootVector = Instantiate(shootVectorPrefab, transform.position, transform.rotation) as GameObject;
         }
+        else
+        {
+            Color color;
+            if (multSzShootVector * _bulletSpeed < 10)
+            {
+                _shootVector.transform.localScale = new Vector3(1, 1, multSzShootVector * _bulletSpeed);
+            }
+                _shootVector.transform.rotation = transform.rotation;
+            if (multSzShootVector * _bulletSpeed < 5)
+            {
+                color = new Color((float)((255 * _bulletSpeed) / 5), 255.0f, 0.0f);
+                shootVectorMaterial.color = color;
+                shootVectorMaterial.SetColor("EmissionColor", color);
+            }
+            else
+            {
+                shootVectorMaterial.color = new Color(255.0f, (float)(255- ((255 * _bulletSpeed) / 5)), 0.0f);
+            }
+            Debug.Log(shootVectorMaterial.color);
+            //shootVectorMaterial.color = new Color(((255 * _bulletSpeed) / 5), 255, 0);
+
+        }
+        
     }
 
     private void MoveToPosition()
