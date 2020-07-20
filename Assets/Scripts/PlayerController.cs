@@ -112,10 +112,13 @@ public class PlayerController : MonoBehaviour
     private void PullBowString(RaycastHit hit)
     {
         _bulletSpeed = Vector3.Distance(new Vector3(hit.point.x, 0f, hit.point.z), _finishPosition);
-        Debug.Log(_bulletSpeed);
         Vector3 HitPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
         transform.LookAt(2 * transform.position - HitPos);
-        //GameObject shootVector = null;
+        DrawShootVector();
+    }
+
+    private void DrawShootVector()
+    {
         if (_createShootVector == false)
         {
             _createShootVector = true;
@@ -123,27 +126,30 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Color color;
-            if (multSzShootVector * _bulletSpeed < 10)
+            float valueMinPowerColor = 1f * multSzShootVector;
+            float valueMidPowerColor = 2f * multSzShootVector;
+            float valueMaxPowerColor = 3f * multSzShootVector;
+
+            if (multSzShootVector * _bulletSpeed < valueMaxPowerColor)
             {
                 _shootVector.transform.localScale = new Vector3(1, 1, multSzShootVector * _bulletSpeed);
             }
-                _shootVector.transform.rotation = transform.rotation;
-            if (multSzShootVector * _bulletSpeed < 5)
+            _shootVector.transform.rotation = transform.rotation;
+            if (multSzShootVector * _bulletSpeed < valueMinPowerColor)
             {
-                color = new Color((float)((255 * _bulletSpeed) / 5), 255.0f, 0.0f);
-                shootVectorMaterial.color = color;
-                shootVectorMaterial.SetColor("EmissionColor", color);
+                shootVectorMaterial.color = Color.green;
             }
-            else
+            else if (multSzShootVector * _bulletSpeed < valueMidPowerColor)
             {
-                shootVectorMaterial.color = new Color(255.0f, (float)(255- ((255 * _bulletSpeed) / 5)), 0.0f);
+                float colorMix = ((multSzShootVector * _bulletSpeed) - valueMinPowerColor) / (valueMidPowerColor - valueMinPowerColor);
+                shootVectorMaterial.color = Color.Lerp(Color.green, Color.yellow, colorMix);
             }
-            Debug.Log(shootVectorMaterial.color);
-            //shootVectorMaterial.color = new Color(((255 * _bulletSpeed) / 5), 255, 0);
-
+            else if (multSzShootVector * _bulletSpeed < valueMaxPowerColor)
+            {
+                float colorMix = ((multSzShootVector * _bulletSpeed) - valueMidPowerColor) / (valueMaxPowerColor - valueMidPowerColor);
+                shootVectorMaterial.color = Color.Lerp(Color.yellow, Color.red, colorMix);
+            }
         }
-        
     }
 
     private void MoveToPosition()
