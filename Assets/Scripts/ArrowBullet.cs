@@ -18,21 +18,9 @@ public class ArrowBullet : MonoBehaviour
         {
             arrowHead.GetComponent<Collider>().isTrigger = false;
             arrow.GetComponent<Rigidbody>().Sleep();
-            yield return wait(timeToDestroy);
+            yield return Assets.Scripts.SupportFunction.wait(timeToDestroy);
             arrowHead.GetComponent<Collider>().isTrigger = true;
             arrow.GetComponent<Collider>().isTrigger = true;
         }
     }
-
-    IEnumerator wait(float waitTime)
-    {
-        float counter = 0;
-
-        while (counter < waitTime)
-        {
-            counter += Time.deltaTime;
-            yield return null;
-        }
-    }
-
 }

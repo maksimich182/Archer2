@@ -8,19 +8,24 @@ public class PlayerController : MonoBehaviour
     public GameObject bulletPrefab;
     public GameObject finishPositionPrefab;
     public GameObject shootVectorPrefab;
+    public GameObject negativeMessagePrefab;
     public Material shootVectorMaterial;
     public Transform gunPoint;
     public int bulletSpeedMult = 10;
-    public float speed = 5;
-    public float multSzShootVector = 5;
+    public float speed = 5f;
+    public float multSzShootVector = 5f;
+    public float lifeTimeNegativeMessage = 3f;
 
     private bool _moveLock = false;
     private bool _animationPullingStringLock = false;
     private bool _createShootVector = false;
+    private bool _isNegativeMessage = false;
     private float _bulletSpeed;
+    private float _timeNegativeMessage = 0f;
     private Vector3 _finishPosition;
     private GameObject _finishPositionMark;
     private GameObject _shootVector;
+    private GameObject _negativeMessage;
     private Animation _animation;
     private RaycastHit _rayMousePosition;
 
@@ -50,15 +55,18 @@ public class PlayerController : MonoBehaviour
             {
                 Destroy(_finishPositionMark);
                 GetMousePosition(out _rayMousePosition);
-                _moveLock = true;
-                if(_animationPullingStringLock == false)
+                if (_rayMousePosition.collider.gameObject.layer == 8)
                 {
-                    _animationPullingStringLock = true;
-                    _animation["PullingString"].speed = 2f;
-                    _animation.Play("PullingString", PlayMode.StopAll);
-                }
+                    _moveLock = true;
+                    if (_animationPullingStringLock == false)
+                    {
+                        _animationPullingStringLock = true;
+                        _animation["PullingString"].speed = 2f;
+                        _animation.Play("PullingString", PlayMode.StopAll);
+                    }
 
-                PullBowString(_rayMousePosition);
+                    PullBowString(_rayMousePosition);
+                }
             }
             else
             {
@@ -92,6 +100,21 @@ public class PlayerController : MonoBehaviour
                 }
             }
             
+        }
+
+        if (_negativeMessage == true)
+        {
+            if (_timeNegativeMessage > lifeTimeNegativeMessage)
+            {
+                _isNegativeMessage = false;
+                _timeNegativeMessage = 0f;
+                Destroy(_negativeMessage);
+            }
+            else
+            {
+                _timeNegativeMessage += Time.deltaTime;
+                _negativeMessage.transform.position = this.transform.position;
+            }
         }
     }
 
@@ -166,6 +189,11 @@ public class PlayerController : MonoBehaviour
             _finishPosition = _rayMousePosition.point;
             _finishPositionMark = Instantiate(finishPositionPrefab, _finishPosition, Quaternion.Euler(0, 0, 0)) as GameObject;
             _finishPosition.y = 0f;     //TODO: Костыльная методика задачи координат. Исправить
+        }
+        else if(_isNegativeMessage == false)
+        {
+            _isNegativeMessage = true;
+            _negativeMessage = Instantiate(negativeMessagePrefab, this.transform.position, Quaternion.Euler(0, 0, 0)) as GameObject;
         }
     }
 }

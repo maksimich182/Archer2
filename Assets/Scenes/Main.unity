@@ -1298,7 +1298,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh75576
+  m_Name: pb_Mesh14346
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -10775,11 +10775,14 @@ MonoBehaviour:
     type: 3}
   shootVectorPrefab: {fileID: 6505312337224632849, guid: 96f2297370c11444c911db31e7651f30,
     type: 3}
+  negativeMessagePrefab: {fileID: 4173924719448689538, guid: 581219a1bb6d1354cbb925bf682683f9,
+    type: 3}
   shootVectorMaterial: {fileID: 2100000, guid: d265b32e63f2bdc49a14d47fb2c1ac37, type: 2}
   gunPoint: {fileID: 1210294547}
   bulletSpeedMult: 300
   speed: 0.1
   multSzShootVector: 5
+  lifeTimeNegativeMessage: 3
 --- !u!111 &1143314761
 Animation:
   m_ObjectHideFlags: 0
