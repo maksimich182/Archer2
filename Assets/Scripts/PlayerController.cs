@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     public float multSzShootVector = 5f;
     public float lifeTimeNegativeMessage = 3f;
 
-    private bool _moveLock = false;
+    private bool _isPullingBow = false;
     private bool _animationPullingStringLock = false;
     private bool _createShootVector = false;
     private bool _isNegativeMessage = false;
@@ -55,9 +55,9 @@ public class PlayerController : MonoBehaviour
             {
                 Destroy(_finishPositionMark);
                 GetMousePosition(out _rayMousePosition);
-                if (_rayMousePosition.collider.gameObject.layer == 8)
+                if (_rayMousePosition.collider.gameObject.layer == 8 || _isPullingBow == true)
                 {
-                    _moveLock = true;
+                    _isPullingBow = true;
                     if (_animationPullingStringLock == false)
                     {
                         _animationPullingStringLock = true;
@@ -82,13 +82,13 @@ public class PlayerController : MonoBehaviour
             Destroy(_shootVector);
             _animation.Play("Idle_Bow", PlayMode.StopAll);
             Destroy(_finishPositionMark);
-            if (_moveLock == true)
+            if (_isPullingBow == true)
             {
                 GetMousePosition(out _rayMousePosition);
-                bool xzCoordinateEquation = _rayMousePosition.point.x == _finishPosition.x && _rayMousePosition.point.z == _finishPosition.z;
-                if (_rayMousePosition.collider.gameObject.layer == 8 && xzCoordinateEquation == false)
+                bool isXZCoordinateEquation = _rayMousePosition.point.x == _finishPosition.x && _rayMousePosition.point.z == _finishPosition.z;
+                if (isXZCoordinateEquation == false)
                 {
-                    _moveLock = false;
+                    _isPullingBow = false;
                     _animation.Play("Shoot", PlayMode.StopAll);
                     Shoot();
                 }
@@ -186,14 +186,19 @@ public class PlayerController : MonoBehaviour
         GetMousePosition(out _rayMousePosition);
         if (_rayMousePosition.collider.gameObject.layer == 8)
         {
+            _isPullingBow = false;
             _finishPosition = _rayMousePosition.point;
             _finishPositionMark = Instantiate(finishPositionPrefab, _finishPosition, Quaternion.Euler(0, 0, 0)) as GameObject;
             _finishPosition.y = 0f;     //TODO: Костыльная методика задачи координат. Исправить
         }
-        else if(_isNegativeMessage == false)
+        else
         {
-            _isNegativeMessage = true;
-            _negativeMessage = Instantiate(negativeMessagePrefab, this.transform.position, Quaternion.Euler(0, 0, 0)) as GameObject;
+            _finishPosition = this.transform.position;
+            if (_isNegativeMessage == false)
+            {
+                _isNegativeMessage = true;
+                _negativeMessage = Instantiate(negativeMessagePrefab, this.transform.position, Quaternion.Euler(0, 0, 0)) as GameObject;
+            }
         }
     }
 }
